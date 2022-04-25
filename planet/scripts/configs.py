@@ -192,7 +192,7 @@ def _loss_functions(config, params):
   config.optimizers = tools.AttrDict(_unlocked=True)
   config.optimizers.main = tools.bind(
       tools.CustomOptimizer,
-      optimizer_cls=tools.bind(tf.train.AdamOptimizer, epsilon=1e-4),
+      optimizer_cls=tools.bind(tf.compat.v1.train.AdamOptimizer, epsilon=1e-4),
       # schedule=tools.bind(tools.schedule.linear, ramp=0),
       learning_rate=params.get('main_learning_rate', 1e-3),
       clipping=params.get('main_gradient_clipping', 1000.0))

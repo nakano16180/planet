@@ -35,7 +35,7 @@ Objective = collections.namedtuple(
 
 def set_up_logging():
   """Configure the TensorFlow logger."""
-  tf.logging.set_verbosity(tf.logging.INFO)
+  tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
   logging.getLogger('tensorflow').propagate = False
   logging.getLogger('tensorflow').format = '%(message)s'
   logging.basicConfig(level=logging.INFO, format='%(message)s')

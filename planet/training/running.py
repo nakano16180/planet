@@ -223,9 +223,9 @@ class Run(object):
     """
     if not self._logdir:
       return True
-    if tf.gfile.Exists(os.path.join(self._logdir, 'PING')):
+    if tf.io.gfile.exists(os.path.join(self._logdir, 'PING')):
       return False
-    if tf.gfile.Exists(os.path.join(self._logdir, 'DONE')):
+    if tf.io.gfile.exists(os.path.join(self._logdir, 'DONE')):
       return False
     return True
 
@@ -237,10 +237,10 @@ class Run(object):
     """
     if not self._logdir:
       return False
-    if tf.gfile.Exists(os.path.join(self._logdir, 'DONE')):
+    if tf.io.gfile.exists(os.path.join(self._logdir, 'DONE')):
       # self._logger.debug('Already done.')
       return False
-    if not tf.gfile.Exists(os.path.join(self._logdir, 'PING')):
+    if not tf.io.gfile.exists(os.path.join(self._logdir, 'PING')):
       # self._logger.debug('Not started yet.')
       return False
     last_worker, last_ping = self._read_ping()
@@ -272,7 +272,7 @@ class Run(object):
     """
     if not self._logdir:
       return
-    with tf.gfile.Open(os.path.join(self._logdir, 'DONE'), 'w') as file_:
+    with tf.io.gfile.GFile(os.path.join(self._logdir, 'DONE'), 'w') as file_:
       file_.write('\n')
 
   def _store_fail(self, message):
@@ -280,7 +280,7 @@ class Run(object):
     """
     if not self._logdir:
       return
-    with tf.gfile.Open(os.path.join(self._logdir, 'FAIL'), 'w') as file_:
+    with tf.io.gfile.GFile(os.path.join(self._logdir, 'FAIL'), 'w') as file_:
       file_.write(message + '\n')
 
   def _read_ping(self):
@@ -292,10 +292,10 @@ class Run(object):
     Raises:
       WorkerConflict: If file operations fail due to concurrent file access.
     """
-    if not tf.gfile.Exists(os.path.join(self._logdir, 'PING')):
+    if not tf.io.gfile.exists(os.path.join(self._logdir, 'PING')):
       return None, None
     try:
-      with tf.gfile.Open(os.path.join(self._logdir, 'PING'), 'rb') as file_:
+      with tf.io.gfile.GFile(os.path.join(self._logdir, 'PING'), 'rb') as file_:
         last_worker, last_ping = pickle.load(file_)
       duration = (datetime.datetime.utcnow() - last_ping).total_seconds()
       return last_worker, duration
@@ -318,11 +318,11 @@ class Run(object):
       last_worker, _ = self._read_ping()
       if last_worker is None:
         self._logger.info("Create directory '{}'.".format(self._logdir))
-        tf.gfile.MakeDirs(self._logdir)
+        tf.io.gfile.makedirs(self._logdir)
       elif last_worker != self._worker_name and not overwrite:
         raise WorkerConflict
       # self._logger.debug('Store ping.')
-      with tf.gfile.Open(os.path.join(self._logdir, 'PING'), 'wb') as file_:
+      with tf.io.gfile.GFile(os.path.join(self._logdir, 'PING'), 'wb') as file_:
         pickle.dump((self._worker_name, datetime.datetime.utcnow()), file_)
     except (EOFError, IOError, tf.errors.NotFoundError):
       raise WorkerConflict
@@ -361,6 +361,6 @@ class Run(object):
     run_name = self._logdir and os.path.basename(self._logdir)
     methods = {}
     for name in 'debug info warning'.split():
-      methods[name] = lambda unused_self, message: getattr(tf.logging, name)(
+      methods[name] = lambda unused_self, message: getattr(tf.compat.v1.logging, name)(
           'Worker {} run {}: {}'.format(self._worker_name, run_name, message))
     return type('PrefixedLogger', (object,), methods)()

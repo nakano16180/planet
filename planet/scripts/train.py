@@ -110,4 +110,4 @@ if __name__ == '__main__':
   args_.params = tools.AttrDict(yaml.safe_load(args_.params.replace('#', ',')))
   args_.logdir = args_.logdir and os.path.expanduser(args_.logdir)
   remaining.insert(0, sys.argv[0])
-  tf.app.run(lambda _: main(args_), remaining)
+  tf.compat.v1.app.run(lambda _: main(args_), remaining)

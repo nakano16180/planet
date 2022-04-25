@@ -10,6 +10,8 @@ scikit-image = "*"
 scipy = "*"
 matplotlib = "*"
 tensorflow = "*"
+"ruamel.yaml" = "*"
+tensorflow-probability = "*"
 
 [dev-packages]
 
