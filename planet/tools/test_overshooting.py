@@ -33,8 +33,8 @@ class _MockCell(models.Base):
   def __init__(self, obs_size):
     self._obs_size = obs_size
     super(_MockCell, self).__init__(
-        tf.make_template('transition', self._transition),
-        tf.make_template('posterior', self._posterior))
+        tf.compat.v1.make_template('transition', self._transition),
+        tf.compat.v1.make_template('posterior', self._posterior))
 
   @property
   def state_size(self):
@@ -68,7 +68,7 @@ class OvershootingTest(tf.test.TestCase):
         cell, obs, obs, prev_action, length, 3)
     prior = tf.squeeze(prior['obs'], 3)
     posterior = tf.squeeze(posterior['obs'], 3)
-    mask = tf.to_int32(mask)
+    mask = tf.cast(mask, dtype=tf.int32)
     with self.test_session():
       # Each column corresponds to a different state step, and each row
       # corresponds to a different overshooting distance from there.

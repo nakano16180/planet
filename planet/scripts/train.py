@@ -62,7 +62,7 @@ def process(logdir, args):
   with config.unlocked:
     config = getattr(configs, args.config)(config, args.params)
   training.utility.collect_initial_episodes(config)
-  tf.reset_default_graph()
+  tf.compat.v1.reset_default_graph()
   dataset = tools.numpy_episodes.numpy_episodes(
       config.train_dir, config.test_dir, config.batch_shape,
       reader=config.data_reader,

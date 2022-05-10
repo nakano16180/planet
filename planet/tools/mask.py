@@ -41,7 +41,7 @@ def mask(tensor, mask=None, length=None, value=0, debug=False):
   """
   if len([x for x in (mask, length) if x is not None]) != 1:
     raise KeyError('Exactly one of mask and length must be provided.')
-  with tf.name_scope('mask'):
+  with tf.compat.v1.name_scope('mask'):
     if mask is None:
       range_ = tf.range(tensor.shape[1].value)
       mask = range_[None, :] < length[:, None]
@@ -50,7 +50,7 @@ def mask(tensor, mask=None, length=None, value=0, debug=False):
       mask = mask[..., None]
     multiples = [1] * batch_dims + tensor.shape[batch_dims:].as_list()
     mask = tf.tile(mask, multiples)
-    masked = tf.where(mask, tensor, value * tf.ones_like(tensor))
+    masked = tf.compat.v1.where(mask, tensor, value * tf.ones_like(tensor))
     if debug:
-      masked = tf.check_numerics(masked, 'masked')
+      masked = tf.debugging.check_numerics(masked, 'masked')
     return masked

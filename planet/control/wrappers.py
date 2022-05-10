@@ -510,12 +510,12 @@ class CollectGymDataset(object):
     return episode
 
   def _write(self, episode, filename):
-    if not tf.gfile.Exists(self._outdir):
-      tf.gfile.MakeDirs(self._outdir)
+    if not tf.io.gfile.exists(self._outdir):
+      tf.io.gfile.makedirs(self._outdir)
     with io.BytesIO() as file_:
       np.savez_compressed(file_, **episode)
       file_.seek(0)
-      with tf.gfile.Open(filename, 'w') as ff:
+      with tf.io.gfile.GFile(filename, 'w') as ff:
         ff.write(file_.read())
     folder = os.path.basename(self._outdir)
     name = os.path.splitext(os.path.basename(filename))[0]

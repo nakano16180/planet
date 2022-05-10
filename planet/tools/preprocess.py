@@ -21,11 +21,11 @@ import tensorflow as tf
 
 def preprocess(image, bits):
   bins = 2 ** bits
-  image = tf.to_float(image)
+  image = tf.compat.v1.to_float(image)
   if bits < 8:
     image = tf.floor(image / 2 ** (8 - bits))
   image = image / bins
-  image = image + tf.random_uniform(tf.shape(image), 0, 1.0 / bins)
+  image = image + tf.random.uniform(tf.shape(input=image), 0, 1.0 / bins)
   image = image - 0.5
   return image
 

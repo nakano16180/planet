@@ -72,12 +72,12 @@ def overshooting(
   # targets for unrolls from it.
   if posterior is None:
     use_obs = tf.ones(tf.shape(
-        nested.flatten(embedded)[0][:, :, :1])[:3], tf.bool)
+        input=nested.flatten(embedded)[0][:, :, :1])[:3], tf.bool)
     use_obs = tf.cond(
-        tf.convert_to_tensor(ignore_input),
-        lambda: tf.zeros_like(use_obs, tf.bool),
-        lambda: use_obs)
-    (_, posterior), _ = tf.nn.dynamic_rnn(
+        pred=tf.convert_to_tensor(value=ignore_input),
+        true_fn=lambda: tf.zeros_like(use_obs, tf.bool),
+        false_fn=lambda: use_obs)
+    (_, posterior), _ = tf.compat.v1.nn.dynamic_rnn(
         cell, (embedded, prev_action, use_obs), length, dtype=tf.float32,
         swap_memory=True)
 
@@ -108,9 +108,9 @@ def overshooting(
       sequences)
   sequences = nested.map(
       lambda tensor: tf.transpose(
-          tensor, [1, 0] + list(range(2, tensor.shape.ndims))),
+          a=tensor, perm=[1, 0] + list(range(2, tensor.shape.ndims))),
       sequences)
-  merged_length = tf.reduce_sum(sequences['mask'], 1)
+  merged_length = tf.reduce_sum(input_tensor=sequences['mask'], axis=1)
 
   # Mask out padding frames; unnecessary if the input is already masked.
   sequences = nested.map(
@@ -120,7 +120,7 @@ def overshooting(
       sequences)
 
   # Compute open loop rollouts.
-  use_obs = tf.zeros(tf.shape(sequences['mask']), tf.bool)[..., None]
+  use_obs = tf.zeros(tf.shape(input=sequences['mask']), tf.bool)[..., None]
   embed_size = nested.flatten(embedded)[0].shape[2].value
   obs = tf.zeros(shape.shape(sequences['mask']) + [embed_size])
   prev_state = nested.map(
@@ -128,7 +128,7 @@ def overshooting(
       posterior)
   prev_state = nested.map(
       lambda tensor: _merge_dims(tensor, [0, 1]), prev_state)
-  (priors, _), _ = tf.nn.dynamic_rnn(
+  (priors, _), _ = tf.compat.v1.nn.dynamic_rnn(
       cell, (obs, sequences['prev_action'], use_obs),
       merged_length,
       prev_state)
@@ -146,14 +146,14 @@ def _merge_dims(tensor, dims):
   """Flatten consecutive axes of a tensor trying to preserve static shapes."""
   if isinstance(tensor, (list, tuple, dict)):
     return nested.map(tensor, lambda x: _merge_dims(x, dims))
-  tensor = tf.convert_to_tensor(tensor)
+  tensor = tf.convert_to_tensor(value=tensor)
   if (np.array(dims) - min(dims) != np.arange(len(dims))).all():
     raise ValueError('Dimensions to merge must all follow each other.')
   start, end = dims[0], dims[-1]
   output = tf.reshape(tensor, tf.concat([
-      tf.shape(tensor)[:start],
-      [tf.reduce_prod(tf.shape(tensor)[start: end + 1])],
-      tf.shape(tensor)[end + 1:]], axis=0))
+      tf.shape(input=tensor)[:start],
+      [tf.reduce_prod(input_tensor=tf.shape(input=tensor)[start: end + 1])],
+      tf.shape(input=tensor)[end + 1:]], axis=0))
   merged = tensor.shape[start: end + 1].as_list()
   output.set_shape(
       tensor.shape[:start].as_list() +

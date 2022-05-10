@@ -60,7 +60,7 @@ def extract_values(reader, tag):
 def export_scalar(basename, steps, times, values):
   safe_print('Writing', basename + '.csv')
   values = [value.item() for value in values]
-  with tf.gfile.Open(basename + '.csv', 'w') as outfile:
+  with tf.io.gfile.GFile(basename + '.csv', 'w') as outfile:
     writer = csv.writer(outfile)
     writer.writerow(('wall_time', 'step', 'value'))
     for row in zip(times, steps, values):
@@ -87,7 +87,7 @@ def export_image(basename, steps, times, values):
 def process_logdir(logdir, args):
   clean = lambda text: re.sub('[^A-Za-z0-9_]', '_', text)
   basename = os.path.join(args.outdir, clean(logdir))
-  if len(tf.gfile.Glob(basename + '*')) > 0 and not args.force:
+  if len(tf.io.gfile.glob(basename + '*')) > 0 and not args.force:
     safe_print('Exists', logdir)
     return
   try:
@@ -111,10 +111,10 @@ def process_logdir(logdir, args):
 
 
 def main(args):
-  logdirs = tf.gfile.Glob(args.logdirs)
+  logdirs = tf.io.gfile.glob(args.logdirs)
   print(len(logdirs), 'logdirs.')
   assert logdirs
-  tf.gfile.MakeDirs(args.outdir)
+  tf.io.gfile.makedirs(args.outdir)
   np.random.shuffle(logdirs)
   pool = multiprocessing.Pool(args.workers)
   worker_fn = functools.partial(process_logdir, args=args)
@@ -143,4 +143,4 @@ if __name__ == '__main__':
   args_.logdirs = os.path.expanduser(args_.logdirs)
   args_.outdir = os.path.expanduser(args_.outdir)
   remaining.insert(0, sys.argv[0])
-  tf.app.run(lambda _: main(args_), remaining)
+  tf.compat.v1.app.run(lambda _: main(args_), remaining)

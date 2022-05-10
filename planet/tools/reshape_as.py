@@ -24,10 +24,10 @@ from planet.tools import nested
 def reshape_as(tensor, reference):
   if isinstance(tensor, (list, tuple, dict)):
     return nested.map(tensor, lambda x: reshape_as(x, reference))
-  tensor = tf.convert_to_tensor(tensor)
-  reference = tf.convert_to_tensor(reference)
+  tensor = tf.convert_to_tensor(value=tensor)
+  reference = tf.convert_to_tensor(value=reference)
   statics = reference.shape.as_list()
-  dynamics = tf.shape(reference)
+  dynamics = tf.shape(input=reference)
   shape = [
       static if static is not None else dynamics[index]
       for index, static in enumerate(statics)]

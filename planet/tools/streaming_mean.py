@@ -33,14 +33,14 @@ class StreamingMean(object):
       dtype: Data type of the mean to compute.
     """
     self._dtype = dtype
-    with tf.variable_scope(name):
-      self._sum = tf.get_variable(
+    with tf.compat.v1.variable_scope(name):
+      self._sum = tf.compat.v1.get_variable(
           'sum', shape, dtype,
-          tf.constant_initializer(0),
+          tf.compat.v1.constant_initializer(0),
           trainable=False)
-      self._count = tf.get_variable(
+      self._count = tf.compat.v1.get_variable(
           'count', (), tf.int32,
-          tf.constant_initializer(0),
+          tf.compat.v1.constant_initializer(0),
           trainable=False)
 
   @property
@@ -55,7 +55,7 @@ class StreamingMean(object):
 
   def submit(self, value):
     """Submit a single or batch tensor to refine the streaming mean."""
-    value = tf.convert_to_tensor(value)
+    value = tf.convert_to_tensor(value=value)
     # Add a batch dimension if necessary.
     if value.shape.ndims == self._sum.shape.ndims:
       value = value[None, ...]
@@ -64,10 +64,10 @@ class StreamingMean(object):
       raise ValueError(message.format(value.shape[1:], self._sum.shape))
     def assign():
       return tf.group(
-        self._sum.assign_add(tf.reduce_sum(value, 0)),
-        self._count.assign_add(tf.shape(value)[0]))
-    not_empty = tf.cast(tf.reduce_prod(tf.shape(value)), tf.bool)
-    return tf.cond(not_empty, assign, tf.no_op)
+        self._sum.assign_add(tf.reduce_sum(input_tensor=value, axis=0)),
+        self._count.assign_add(tf.shape(input=value)[0]))
+    not_empty = tf.cast(tf.reduce_prod(input_tensor=tf.shape(input=value)), tf.bool)
+    return tf.cond(pred=not_empty, true_fn=assign, false_fn=tf.no_op)
 
   def clear(self):
     """Return the mean estimate and reset the streaming statistics."""

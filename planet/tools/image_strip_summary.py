@@ -36,9 +36,9 @@ def image_strip_summary(name, images, max_length=100, max_batch=10):
   if max_length:
     images = images[:, :max_length]
   if images.dtype == tf.uint8:
-    images = tf.to_float(images) / 255.0
-  length, width = tf.shape(images)[1], tf.shape(images)[3]
-  images = tf.transpose(images, [0, 2, 1, 3, 4])
+    images = tf.cast(images, dtype=tf.float32) / 255.0
+  length, width = tf.shape(input=images)[1], tf.shape(input=images)[3]
+  images = tf.transpose(a=images, perm=[0, 2, 1, 3, 4])
   images = tf.reshape(images, [1, -1, length * width, 3])
   images = tf.clip_by_value(images, 0., 1.)
-  return tf.summary.image(name, images)
+  return tf.compat.v1.summary.image(name, images)

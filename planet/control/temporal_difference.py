@@ -23,13 +23,13 @@ import tensorflow as tf
 def discounted_return(reward, discount, bootstrap, axis, stop_gradient=True):
   """Discounted Monte Carlo return."""
   if discount == 1 and bootstrap is None:
-    return tf.reduce_sum(reward, axis)
+    return tf.reduce_sum(input_tensor=reward, axis=axis)
   if discount == 1:
-    return tf.reduce_sum(reward, axis) + bootstrap
+    return tf.reduce_sum(input_tensor=reward, axis=axis) + bootstrap
   # Bring the aggregation dimension front.
   dims = list(range(reward.shape.ndims))
   dims = [axis] + dims[1:axis] + [0] + dims[axis + 1:]
-  reward = tf.transpose(reward, dims)
+  reward = tf.transpose(a=reward, perm=dims)
   if bootstrap is None:
     bootstrap = tf.zeros_like(reward[-1])
   return_ = tf.scan(
@@ -38,7 +38,7 @@ def discounted_return(reward, discount, bootstrap, axis, stop_gradient=True):
       initializer=bootstrap,
       back_prop=not stop_gradient,
       reverse=True)
-  return_ = tf.transpose(return_, dims)
+  return_ = tf.transpose(a=return_, perm=dims)
   if stop_gradient:
     return_ = tf.stop_gradient(return_)
   return return_
@@ -55,8 +55,8 @@ def lambda_return(
   # Bring the aggregation dimension front.
   dims = list(range(reward.shape.ndims))
   dims = [axis] + dims[1:axis] + [0] + dims[axis + 1:]
-  reward = tf.transpose(reward, dims)
-  value = tf.transpose(value, dims)
+  reward = tf.transpose(a=reward, perm=dims)
+  value = tf.transpose(a=value, perm=dims)
   if bootstrap is None:
     bootstrap = tf.zeros_like(value[-1])
   next_values = tf.concat([value[1:], bootstrap[None]], 0)
@@ -67,7 +67,7 @@ def lambda_return(
       initializer=bootstrap,
       back_prop=not stop_gradient,
       reverse=True)
-  return_ = tf.transpose(return_, dims)
+  return_ = tf.transpose(a=return_, perm=dims)
   if stop_gradient:
     return_ = tf.stop_gradient(return_)
   return return_
@@ -79,16 +79,16 @@ def fixed_step_return(
   # Brings the aggregation dimension front.
   dims = list(range(reward.shape.ndims))
   dims = [axis] + dims[1:axis] + [0] + dims[axis + 1:]
-  reward = tf.transpose(reward, dims)
-  length = tf.shape(reward)[0]
+  reward = tf.transpose(a=reward, perm=dims)
+  length = tf.shape(input=reward)[0]
   _, return_ = tf.while_loop(
       cond=lambda i, p: i < steps + 1,
       body=lambda i, p: (i + 1, reward[steps - i: length - i] + discount * p),
       loop_vars=[tf.constant(1), tf.zeros_like(reward[steps:])],
       back_prop=not stop_gradient)
   if value is not None:
-    return_ += discount ** steps * tf.transpose(value, dims)[steps:]
-  return_ = tf.transpose(return_, dims)
+    return_ += discount ** steps * tf.transpose(a=value, perm=dims)[steps:]
+  return_ = tf.transpose(a=return_, perm=dims)
   if stop_gradient:
     return_ = tf.stop_gradient(return_)
   return return_

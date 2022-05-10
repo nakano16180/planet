@@ -45,7 +45,7 @@ def chunk_sequence(sequence, chunk_length, randomize=True, num_chunks=None):
     if 'length' in sequence:
       length = sequence.pop('length')
     else:
-      length = tf.shape(nested.flatten(sequence)[0])[0]
+      length = tf.shape(input=nested.flatten(sequence)[0])[0]
     if randomize:
       if num_chunks is None:
         num_chunks = tf.maximum(1, length // chunk_length - 1)
@@ -53,7 +53,7 @@ def chunk_sequence(sequence, chunk_length, randomize=True, num_chunks=None):
         num_chunks = num_chunks + 0 * length
       used_length = num_chunks * chunk_length
       max_offset = length - used_length
-      offset = tf.random_uniform((), 0, max_offset + 1, dtype=tf.int32)
+      offset = tf.random.uniform((), 0, max_offset + 1, dtype=tf.int32)
     else:
       if num_chunks is None:
         num_chunks = length // chunk_length

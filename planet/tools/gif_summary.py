@@ -88,17 +88,17 @@ def py_gif_summary(tag, images, max_outputs, fps):
   batch_size, _, height, width, channels = images.shape
   if channels not in (1, 3):
     raise ValueError("Tensors must have 1 or 3 channels for gif summary.")
-  summ = tf.Summary()
+  summ = tf.compat.v1.Summary()
   num_outputs = min(batch_size, max_outputs)
   for i in range(num_outputs):
-    image_summ = tf.Summary.Image()
+    image_summ = tf.compat.v1.Summary.Image()
     image_summ.height = height
     image_summ.width = width
     image_summ.colorspace = channels  # 1: grayscale, 3: RGB
     try:
       image_summ.encoded_image_string = encode_gif(images[i], fps)
     except (IOError, OSError) as e:
-      tf.logging.warning(
+      tf.compat.v1.logging.warning(
           "Unable to encode images to a gif string because either ffmpeg is "
           "not installed or ffmpeg returned an error: %s. Falling back to an "
           "image summary of the first frame in the sequence.", e)
@@ -109,7 +109,7 @@ def py_gif_summary(tag, images, max_outputs, fps):
           Image.fromarray(images[i][0]).save(output, "PNG")
           image_summ.encoded_image_string = output.getvalue()
       except Exception:
-        tf.logging.warning(
+        tf.compat.v1.logging.warning(
             "Gif summaries requires ffmpeg or PIL to be installed: %s", e)
         image_summ.encoded_image_string = (
             "".encode('utf-8') if is_bytes else "")
@@ -140,16 +140,16 @@ def gif_summary(name, tensor, max_outputs, fps, collections=None, family=None):
     A scalar `Tensor` of type `string`. The serialized `Summary` protocol
     buffer.
   """
-  tensor = tf.convert_to_tensor(tensor)
+  tensor = tf.convert_to_tensor(value=tensor)
   if tensor.dtype in (tf.float32, tf.float64):
     tensor = tf.cast(255.0 * tensor, tf.uint8)
   with summary_op_util.summary_scope(
       name, family, values=[tensor]) as (tag, scope):
-    val = tf.py_func(
+    val = tf.compat.v1.py_func(
         py_gif_summary,
         [tag, tensor, max_outputs, fps],
         tf.string,
         stateful=False,
         name=scope)
-    summary_op_util.collect(val, collections, [tf.GraphKeys.SUMMARIES])
+    summary_op_util.collect(val, collections, [tf.compat.v1.GraphKeys.SUMMARIES])
   return val

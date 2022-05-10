@@ -51,13 +51,13 @@ def numpy_episodes(
     dtypes, shapes = _read_spec(reader, train_dir)
   except ZeroDivisionError:
     dtypes, shapes = _read_spec(reader, test_dir)
-  train = tf.data.Dataset.from_generator(
+  train = tf.compat.v1.data.Dataset.from_generator(
       functools.partial(loader, reader, train_dir, shape[0]),
       dtypes, shapes)
-  test = tf.data.Dataset.from_generator(
+  test = tf.compat.v1.data.Dataset.from_generator(
       functools.partial(loader, reader, test_dir, shape[0]),
       dtypes, shapes)
-  chunking = lambda x: tf.data.Dataset.from_tensor_slices(
+  chunking = lambda x: tf.compat.v1.data.Dataset.from_tensor_slices(
       chunk_sequence.chunk_sequence(x, shape[1], True, num_chunks))
   def sequence_preprocess_fn(sequence):
     if preprocess_fn:
@@ -78,7 +78,7 @@ def cache_loader(reader, directory, batch_size, every):
     episodes = _sample(cache.values(), every)
     for episode in _permuted(episodes, every):
       yield episode
-    filenames = tf.gfile.Glob(os.path.join(directory, '*.npz'))
+    filenames = tf.io.gfile.glob(os.path.join(directory, '*.npz'))
     filenames = [filename for filename in filenames if filename not in cache]
     for filename in filenames:
       cache[filename] = reader(filename)
@@ -95,7 +95,7 @@ def recent_loader(reader, directory, batch_size, every):
       yield episode
     cache.update(recent)
     recent = {}
-    filenames = tf.gfile.Glob(os.path.join(directory, '*.npz'))
+    filenames = tf.io.gfile.glob(os.path.join(directory, '*.npz'))
     filenames = [filename for filename in filenames if filename not in cache]
     for filename in filenames:
       recent[filename] = reader(filename)
@@ -104,7 +104,7 @@ def recent_loader(reader, directory, batch_size, every):
 def reload_loader(reader, directory, batch_size):
   directory = os.path.expanduser(directory)
   while True:
-    filenames = tf.gfile.Glob(os.path.join(directory, '*.npz'))
+    filenames = tf.io.gfile.glob(os.path.join(directory, '*.npz'))
     random.shuffle(filenames)
     for filename in filenames:
       yield reader(filename)
@@ -127,7 +127,7 @@ def dummy_loader(reader, directory, batch_size):
 
 
 def episode_reader(filename, resize=None, max_length=None, action_noise=None):
-  with tf.gfile.Open(filename, 'rb') as file_:
+  with tf.io.gfile.GFile(filename, 'rb') as file_:
     episode = np.load(file_)
   episode = {key: _convert_type(episode[key]) for key in episode.keys()}
   episode['return'] = np.cumsum(episode['reward'])

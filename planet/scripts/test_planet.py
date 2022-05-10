@@ -42,7 +42,7 @@ class PlanetTest(tf.test.TestCase):
         ping_every=0,
         resume_runs=False)
     try:
-      tf.app.run(lambda _: train.main(args), [sys.argv[0]])
+      tf.compat.v1.app.run(lambda _: train.main(args), [sys.argv[0]])
     except SystemExit:
       pass
 
@@ -58,7 +58,7 @@ class PlanetTest(tf.test.TestCase):
         ping_every=0,
         resume_runs=False)
     try:
-      tf.app.run(lambda _: train.main(args), [sys.argv[0]])
+      tf.compat.v1.app.run(lambda _: train.main(args), [sys.argv[0]])
     except SystemExit:
       pass
 
@@ -74,7 +74,7 @@ class PlanetTest(tf.test.TestCase):
         ping_every=0,
         resume_runs=False)
     try:
-      tf.app.run(lambda _: train.main(args), [sys.argv[0]])
+      tf.compat.v1.app.run(lambda _: train.main(args), [sys.argv[0]])
     except SystemExit:
       pass
 
@@ -90,7 +90,7 @@ class PlanetTest(tf.test.TestCase):
         ping_every=0,
         resume_runs=False)
     try:
-      tf.app.run(lambda _: train.main(args), [sys.argv[0]])
+      tf.compat.v1.app.run(lambda _: train.main(args), [sys.argv[0]])
     except SystemExit:
       pass
 
@@ -106,7 +106,7 @@ class PlanetTest(tf.test.TestCase):
         ping_every=0,
         resume_runs=False)
     try:
-      tf.app.run(lambda _: train.main(args), [sys.argv[0]])
+      tf.compat.v1.app.run(lambda _: train.main(args), [sys.argv[0]])
     except SystemExit:
       pass
 
@@ -122,7 +122,7 @@ class PlanetTest(tf.test.TestCase):
         ping_every=0,
         resume_runs=False)
     try:
-      tf.app.run(lambda _: train.main(args), [sys.argv[0]])
+      tf.compat.v1.app.run(lambda _: train.main(args), [sys.argv[0]])
     except SystemExit:
       pass
 

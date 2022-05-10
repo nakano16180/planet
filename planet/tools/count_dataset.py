@@ -24,13 +24,13 @@ import tensorflow as tf
 
 def count_dataset(directory, key='reward'):
   directory = os.path.expanduser(directory)
-  if not tf.gfile.Exists(directory):
+  if not tf.io.gfile.exists(directory):
     message = "Data set directory '{}' does not exist."
     raise ValueError(message.format(directory))
   pattern = os.path.join(directory, '*.npz')
   def func():
-    filenames = tf.gfile.Glob(pattern)
+    filenames = tf.io.gfile.glob(pattern)
     episodes = len(filenames)
     episodes = np.array(episodes, dtype=np.int32)
     return episodes
-  return tf.py_func(func, [], tf.int32)
+  return tf.compat.v1.py_func(func, [], tf.int32)

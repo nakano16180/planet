@@ -25,14 +25,14 @@ from planet.tools import copy_weights
 def track_network(
     trainer, batch_size, source_pattern, target_pattern, every, amount):
   init_op = tf.cond(
-      tf.equal(trainer.global_step, 0),
-      lambda: copy_weights.soft_copy_weights(
+      pred=tf.equal(trainer.global_step, 0),
+      true_fn=lambda: copy_weights.soft_copy_weights(
           source_pattern, target_pattern, 1.0),
-      tf.no_op)
+      false_fn=tf.no_op)
   schedule = schedule_lib.binary(trainer.step, batch_size, 0, every, -1)
   with tf.control_dependencies([init_op]):
     return tf.cond(
-        tf.logical_and(tf.equal(trainer.phase, 'train'), schedule),
-        lambda: copy_weights.soft_copy_weights(
+        pred=tf.logical_and(tf.equal(trainer.phase, 'train'), schedule),
+        true_fn=lambda: copy_weights.soft_copy_weights(
             source_pattern, target_pattern, amount),
-        tf.no_op)
+        false_fn=tf.no_op)

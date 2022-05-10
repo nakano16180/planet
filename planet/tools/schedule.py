@@ -37,7 +37,7 @@ def linear(step, ramp, min=None, max=None):
   if ramp == 0:
     result = tf.constant(1, tf.float32)
   if ramp > 0:
-    result = tf.minimum(tf.to_float(step) / tf.to_float(ramp), 1)
+    result = tf.minimum(tf.cast(step, dtype=tf.float32) / tf.cast(ramp, dtype=tf.float32), 1)
   if ramp < 0:
     result = 1 - linear(step, abs(ramp))
   if min is not None and max is not None:
@@ -57,9 +57,9 @@ def linear_reset(step, ramp, after, every):
   assert every > ramp, (every, ramp)  # Would never reach max value.
   assert not (every != np.inf and after == np.inf), (every, after)
   step, ramp, after, every = [
-      tf.to_float(x) for x in (step, ramp, after, every)]
-  before = tf.to_float(tf.less(step, after)) * step
-  after = tf.to_float(tf.greater_equal(step, after)) * ((step - after) % every)
+      tf.cast(x, dtype=tf.float32) for x in (step, ramp, after, every)]
+  before = tf.cast(tf.less(step, after), dtype=tf.float32) * step
+  after = tf.cast(tf.greater_equal(step, after), dtype=tf.float32) * ((step - after) % every)
   result = tf.minimum((before + after) / ramp, 1)
   result.set_shape(tf.TensorShape([]))
   return result
