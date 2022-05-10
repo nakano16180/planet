@@ -16,12 +16,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from planet import tools
 
 
-class Base(tf.compat.v1.nn.rnn_cell.RNNCell):
+class Base(tf.nn.rnn_cell.RNNCell):
 
   def __init__(self, transition_tpl, posterior_tpl, reuse=None):
     super(Base, self).__init__(_reuse=reuse)

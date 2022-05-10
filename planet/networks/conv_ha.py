@@ -17,7 +17,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from tensorflow_probability import distributions as tfd
 
 from planet import tools
@@ -42,7 +42,7 @@ def decoder(state, data_shape):
   """Compute the data distribution of an observation from its state."""
   kwargs = dict(strides=2, activation=tf.nn.relu)
   hidden = tf.layers.dense(state, 1024, None)
-  hidden = tf.reshape(hidden, [-1, 1, 1, hidden.shape[-1].value])
+  hidden = tf.reshape(hidden, [-1, 1, 1, hidden.shape[-1]])
   hidden = tf.layers.conv2d_transpose(hidden, 128, 5, **kwargs)
   hidden = tf.layers.conv2d_transpose(hidden, 64, 5, **kwargs)
   hidden = tf.layers.conv2d_transpose(hidden, 32, 6, **kwargs)

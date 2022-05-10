@@ -16,7 +16,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from tensorflow_probability import distributions as tfd
 
 from planet import tools
@@ -52,7 +52,7 @@ class RSSM(base.Base):
     self._belief_size = belief_size
     self._embed_size = embed_size
     self._future_rnn = future_rnn
-    self._cell = tf.contrib.rnn.GRUBlockCell(self._belief_size)
+    self._cell = tf.nn.rnn_cell.GRUCell(self._belief_size)
     self._kwargs = dict(units=self._embed_size, activation=activation)
     self._mean_only = mean_only
     self._min_stddev = min_stddev

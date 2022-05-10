@@ -19,10 +19,11 @@ from __future__ import print_function
 import collections
 import os
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from planet import tools
 
+tf.disable_eager_execution()
 
 _Phase = collections.namedtuple(
     'Phase',

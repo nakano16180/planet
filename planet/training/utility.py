@@ -22,7 +22,7 @@ import logging
 import os
 
 import ruamel.yaml as yaml
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from planet import control
 from planet import tools
@@ -35,7 +35,7 @@ Objective = collections.namedtuple(
 
 def set_up_logging():
   """Configure the TensorFlow logger."""
-  tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
+  tf.logging.set_verbosity(tf.logging.INFO)
   logging.getLogger('tensorflow').propagate = False
   logging.getLogger('tensorflow').format = '%(message)s'
   logging.basicConfig(level=logging.INFO, format='%(message)s')
