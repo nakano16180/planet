@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+scikit-image = "==0.14.1"
+scipy = "==1.2.0"
+gym = "*"
+dm-control = "*"
+tensorflow = "==1.13.1"
+tensorflow-gpu = "==1.13.1"
+tensorflow-probability = "==0.6.0"
+"ruamel.yaml" = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"
