@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-scikit-image = "==0.14.1"
+scikit-image = "==0.14.2"
 scipy = "==1.2.0"
 gym = "*"
 dm-control = "*"
